@@ -39,7 +39,7 @@ int is2expNleft(bool isSigned, int bitLength, float input)
             temp = num.at(i) - 1;  //check for 1.00, should need 1 integer bit at least, if signed should need 2 bits...
             if(integer == temp)
             {
-                match = temp;
+                match = 1;
                 usedBits = integerBits + isSigned;
                 cout << "^^^ pefect match" << endl;
                 //break;
@@ -102,7 +102,7 @@ int is2expNright(int bitLength, float input)
         if (count < 0){count =0;}
         return count;
 }
-int bump2nextFrac(float input, int decPlaces, int binBits)
+float bump2nextFrac(float input, int decPlaces, int binBits)
 {
 //STEPS
 //1 Take input value from cin and strip integer off
@@ -111,6 +111,37 @@ int bump2nextFrac(float input, int decPlaces, int binBits)
 //3 Search lookup vector to see if input decimal is already in 2expN friendly format
 //4 If input decimal is not found in vector, use vector to find nearest win (if tie let even index win)
 //5 return valid decimal for re-union with valid integer portion
+integer = 0;
+decimal = 0;
+if (decPlaces > binBits)
+{
+    cout << "NOT ENOUGH BITS AVAILABLE" << endl;
+    return 0;
+}
+//
+////Test user decimal for exact 2^N format match
+int match = -1;
+integer = floor(input);
+decimal = input - integer;
+float mod = -1;
+float divisor = (pow(2,decPlaces));
+divisor = 1/divisor;
+mod = fmod(decimal, divisor);
+cout << "Val: " << decimal << " Div: " << divisor << " Modulo: " << mod << endl;
+
+if (mod == 0)
+{
+    cout << "Decimal is 2^(-N) format already" << endl;
+    return (integer + decimal);
+}
+if (mod != 0)
+{
+    cout << "NEED TO BUMP TO NEXT VALUE" << endl;
+    return 0;
+}
+
+return 0;
+
 }
 int main()
 {
@@ -134,6 +165,7 @@ int main()
     int integerBitsUsed;
     int maxDecimalBits;
     int numDecPlaces;
+    float validDecimal;
 
     //CHECK LEFT SIDE: If left side is 2expN valid, return consumed binary bits
     cout << "### CHECK LEFT SIDE ###" << endl;
@@ -148,10 +180,13 @@ int main()
     //CHECK RIGHT SIDE: If left side valid, see if right side is valid, if so return needed number of base 2 bits req'd to show desired base 10 dec places
     cout << "### CHECK RIGHT SIDE ###" << endl;
     cout << "---------------------------------------------------" << endl;
+
     numDecPlaces = is2expNright(bitLength, input);
     maxDecimalBits = bitLength - integerBitsUsed;
     cout << "[AVAIL PRECISION]   Base 2 Bits Available:         " << maxDecimalBits << endl;
     cout << "[DESIRED PRECISION] Base 10 Decimal Places Needed: " << numDecPlaces << endl;
 
+    validDecimal = bump2nextFrac(input, numDecPlaces, maxDecimalBits);
+    cout << "[VALID 2^(-N) PRECISION]  Base 2 friendly decimal: " << validDecimal << endl;
     return 0;
 }
