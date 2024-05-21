@@ -129,6 +129,9 @@ divisor = 1/divisor;
 mod = fmod(decimal, divisor);
 cout << "Val: " << decimal << " Div: " << divisor << " Modulo: " << mod << endl;
 
+float upScale, dnScale;
+int modScale;
+
 if (mod == 0)
 {
     cout << "Decimal is 2^(-N) format already" << endl;
@@ -137,7 +140,11 @@ if (mod == 0)
 if (mod != 0)
 {
     cout << "NEED TO BUMP TO NEXT VALUE" << endl;
-    return 0;
+    upScale = input * pow(2,(decPlaces+1));
+    modScale = floor(upScale);
+    dnScale = modScale / (pow(2,(decPlaces+1)));
+    //cout << "dnScale = " << dnScale << endl << endl;
+    return dnScale;
 }
 
 return 0;
